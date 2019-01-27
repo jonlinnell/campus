@@ -2,6 +2,8 @@
 const moment = require('moment')
 const { Schema, model } = require('mongoose')
 
+const permissions = Object.values(require('../constants/permissions'))
+
 const userSchema = new Schema({
   username: {
     type: String,
@@ -19,8 +21,9 @@ const userSchema = new Schema({
     type: String,
     required: true,
   },
-  privileges: {
-    type: Array,
+  permissions: {
+    type: [String],
+    enum: permissions,
   },
   createdBy: String,
   createdOn: {

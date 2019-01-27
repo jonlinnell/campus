@@ -19,7 +19,7 @@ module.exports = (app) => {
       surname,
       givenName,
       password,
-      privileges,
+      permissions,
     } = req.body
 
     bcrypt.hash(password, hashPasses, (err, hashedPassword) => {
@@ -31,7 +31,7 @@ module.exports = (app) => {
           surname,
           givenName,
           password: hashedPassword,
-          privileges,
+          permissions,
           createdBy: req.user.username,
           createdOn: moment(),
         })
@@ -97,7 +97,7 @@ module.exports = (app) => {
           jwt.sign(
             {
               username,
-              privileges: existingUser.privileges,
+              permissions: existingUser.permissions,
             },
             secret,
             {
