@@ -62,3 +62,6 @@ typings/
 
 # Secret key for JWT
 .secret
+
+# macOS debris
+.DS_Store
