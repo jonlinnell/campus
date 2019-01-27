@@ -1,8 +1,9 @@
 /* eslint-disable func-names */
-const moment = require('moment')
 const { Schema, model } = require('mongoose')
 
 const permissions = Object.values(require('../constants/permissions'))
+
+const passwordRegex = new RegExp(/^$|^(?=.*[A-Z])+(?=.*[!@#$&*\-_€£])(?=.*[0-9])+(?=.*[a-z])+.+$/)
 
 const userSchema = new Schema({
   username: {
@@ -13,6 +14,7 @@ const userSchema = new Schema({
   password: {
     type: String,
     required: true,
+    validate: passwordRegex,
   },
   surname: {
     type: String,
@@ -28,7 +30,7 @@ const userSchema = new Schema({
   createdBy: String,
   createdOn: {
     type: Date,
-    default: moment(),
+    default: new Date(),
   },
   lastModified: Date,
 })

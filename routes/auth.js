@@ -3,8 +3,10 @@ const jwt = require('jsonwebtoken')
 const path = require('path')
 const fs = require('fs')
 const moment = require('moment')
+const Joi = require('joi')
 
 const User = require('../models/user')
+const { userCreateValidationSchema, userUpdateValidationSchema } = require('../validationSchema/user')
 
 const verifyToken = require('../lib/verifyToken')
 
@@ -14,32 +16,38 @@ const hashPasses = 5
 
 module.exports = (app) => {
   app.post(`${endpoint}/register`, verifyToken, (req, res) => {
-    const {
-      username,
-      surname,
-      givenName,
-      password,
-      permissions,
-    } = req.body
-
-    bcrypt.hash(password, hashPasses, (err, hashedPassword) => {
-      if (err) {
-        res.status(400).send(`Error generating password: ${err}.`)
+    Joi.validate(req.body, userCreateValidationSchema, (invalid) => {
+      if (invalid) {
+        res.status(400).send(invalid)
       } else {
-        const newUser = new User({
+        const {
           username,
           surname,
           givenName,
-          password: hashedPassword,
+          password,
           permissions,
-          createdBy: req.user.username,
-          createdOn: moment(),
-        })
+        } = req.body
 
-        newUser
-          .save()
-          .then(savedNewUser => res.json({ adminUser: req.user.username, savedNewUser }))
-          .catch(saveError => res.status(500).send(saveError))
+        bcrypt.hash(password, hashPasses, (err, hashedPassword) => {
+          if (err) {
+            res.status(400).send(`Error generating password: ${err}.`)
+          } else {
+            const newUser = new User({
+              username,
+              surname,
+              givenName,
+              password: hashedPassword,
+              permissions,
+              createdBy: req.user.username,
+              createdOn: moment(),
+            })
+
+            newUser
+              .save()
+              .then(savedNewUser => res.json({ adminUser: req.user.username, savedNewUser }))
+              .catch(saveError => res.status(500).send(saveError))
+          }
+        })
       }
     })
   })
@@ -68,21 +76,23 @@ module.exports = (app) => {
     const updateValues = req.body
     delete updateValues.password // Just in case
 
-    if (updateValues.username) {
-      res.status(400).json({ message: 'Username cannot be updated.' })
-    } else {
-      User.updateOne(
-        { username: req.params.username },
-        { $set: req.body },
-        (updateError) => {
-          if (updateError) {
-            res.status(500).send(updateError)
-          } else {
-            res.sendStatus(200) // Be more verbose?
-          }
-        },
-      )
-    }
+    Joi.validate(req.body, userUpdateValidationSchema, (invalid) => {
+      if (invalid) {
+        res.status(400).send(invalid)
+      } else {
+        User.updateOne(
+          { username: req.params.username },
+          { $set: req.body },
+          (updateError) => {
+            if (updateError) {
+              res.status(500).send(updateError)
+            } else {
+              res.sendStatus(200) // Be more verbose?
+            }
+          },
+        )
+      }
+    })
   })
 
   app.post(`${endpoint}/login`, (req, res) => {
