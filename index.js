@@ -1,17 +1,21 @@
 require('dotenv').config()
 
-const express = require('express')
 const bodyParser = require('body-parser')
 const cors = require('cors')
-const helmet = require('helmet')
-const morgan = require('morgan')
+const express = require('express')
 const fs = require('fs')
+const helmet = require('helmet')
+const mongoose = require('mongoose')
+const morgan = require('morgan')
 const path = require('path')
 
 const port = process.env.PORT || 3000
-const routes = path.resolve(`${__dirname}/routes`)
-
-const { NODE_ENV } = process.env
+const routes = `${__dirname}/routes`
+const NODE_ENV = process.env.NODE_ENV || 'development'
+const {
+  DB_HOST,
+  DB_NAME,
+} = process.env
 
 const app = express()
 
@@ -27,4 +31,11 @@ fs.readdir(routes, (error, files) => {
   files.forEach(file => require(path.resolve(`${routes}/${file}`))(app)) // eslint-disable-line
 })
 
-app.listen(port, () => process.stdout.write('Listening!\n'))
+mongoose.connect(`mongodb://${DB_HOST}/${DB_NAME}`, { useNewUrlParser: true })
+const db = mongoose.connection
+
+db.on('error', error => process.stderr.write(`MongoDB ${error}\n`))
+db.once('connected', () => {
+  process.stdout.write('Database connected.\n')
+  app.listen(port, () => process.stdout.write(`In ${NODE_ENV} mode, listening on port ${port}...\n`))
+})
