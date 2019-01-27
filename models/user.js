@@ -1,3 +1,4 @@
+/* eslint-disable func-names */
 const moment = require('moment')
 const { Schema, model } = require('mongoose')
 
@@ -22,18 +23,16 @@ const userSchema = new Schema({
     type: Array,
   },
   createdBy: String,
-  createdOn: Date,
-  lastModifiedOn: Date,
+  createdOn: {
+    type: Date,
+    default: moment(),
+  },
+  lastModified: Date,
 })
 
-userSchema.pre('save', (next) => {
-  const now = moment()
+userSchema.pre('updateOne', function (next) {
+  this.update({}, { $set: { lastModified: new Date() } })
 
-  if (!this.createdOn) {
-    this.createdOn = now
-  }
-
-  this.lastModifiedOn = now
   next()
 })
 
