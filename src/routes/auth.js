@@ -11,7 +11,7 @@ const { userCreateValidationSchema, userUpdateValidationSchema } = require('../v
 const verifyToken = require('../lib/verifyToken')
 const addUser = require('../lib/addUser')
 
-const secret = fs.readFileSync(path.resolve(`${__dirname}/../.secret`)).toString()
+const secret = fs.readFileSync(path.resolve(`${__dirname}/../../.secret`)).toString()
 const hashPasses = 5
 
 const router = Router()

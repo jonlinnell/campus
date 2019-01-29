@@ -8,10 +8,10 @@ const helmet = require('helmet')
 const morgan = require('morgan')
 const path = require('path')
 
-const bootstrapDatabase = require('./lib/bootstrapDatabase')
+const bootstrapDatabase = require('./src/lib/bootstrapDatabase')
 
 const port = process.env.PORT || 3000
-const routes = `${__dirname}/routes`
+const routes = `${__dirname}/src/routes`
 const NODE_ENV = process.env.NODE_ENV || 'development'
 
 const app = express()

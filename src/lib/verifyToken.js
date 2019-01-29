@@ -4,7 +4,7 @@ const path = require('path')
 
 const User = require('../models/user')
 
-const secret = fs.readFileSync(path.resolve(`${__dirname}/../.secret`), 'utf8')
+const secret = fs.readFileSync(path.resolve(`${__dirname}/../../.secret`), 'utf8')
 
 module.exports = (req, res, next) => {
   const token = req.headers['x-access-token']
