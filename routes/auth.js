@@ -75,8 +75,7 @@ router.post('/login', (req, res) => {
   const { username, password } = req.body
 
   User
-    .findOne({ username })
-    .then((existingUser) => {
+    .findOne({ username }, (error, existingUser) => {
       if (!existingUser) {
         res.status(400).json({ authorised: false, message: 'User does not exist.' })
       } else if (bcrypt.compareSync(password, existingUser.password)) {
