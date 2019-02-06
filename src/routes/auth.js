@@ -77,7 +77,7 @@ router.post('/login', (req, res) => {
   User
     .findOne({ username }, (error, existingUser) => {
       if (!existingUser) {
-        res.status(400).json({ authorised: false, message: 'User does not exist.' })
+        res.status(400).json({ authorised: false, type: 'username', message: 'User does not exist.' })
       } else if (bcrypt.compareSync(password, existingUser.password)) {
         jwt.sign(
           {
@@ -91,7 +91,7 @@ router.post('/login', (req, res) => {
           (err, token) => res.json({ authorised: true, token }),
         )
       } else {
-        res.status(403).json({ authorised: false, message: 'Password incorrect.' })
+        res.status(403).json({ authorised: false, type: 'password', message: 'Password incorrect.' })
       }
     })
 })
@@ -103,7 +103,7 @@ router.delete('/user/:username', verifyToken, (req, res) => {
     } else if (dbRes) {
       res.status(200).send({ username: dbRes.username })
     } else {
-      res.status(404).send({ message: 'User does not exist.' })
+      res.status(404).send({ authorised: false, type: 'username', message: 'User does not exist.' })
     }
   })
 })
