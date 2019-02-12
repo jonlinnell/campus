@@ -10,6 +10,7 @@ const { userCreateValidationSchema, userUpdateValidationSchema } = require('../v
 
 const verifyToken = require('../lib/verifyToken')
 const addUser = require('../lib/addUser')
+const findUser = require('../lib/findUser')
 
 const secret = fs.readFileSync(path.resolve(`${__dirname}/../../.secret`)).toString()
 const hashPasses = 5
@@ -26,6 +27,12 @@ router.post('/register', verifyToken, (req, res) => {
         .catch(addUserError => res.status(500).send(addUserError))
     }
   })
+})
+
+router.get('/me', verifyToken, (req, res) => {
+  findUser({ username: req.user.username, fields: 'username permissions givenName' })
+    .then(foundUser => res.json(foundUser))
+    .catch(error => res.status(500).send(error))
 })
 
 router.put('/user/password/:username', verifyToken, (req, res) => {
